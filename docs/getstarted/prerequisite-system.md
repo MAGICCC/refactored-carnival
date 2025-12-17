@@ -4,7 +4,7 @@ Before you run **mailcow: dockerized**, there are a few requirements that you sh
     Do **not** try to install mailcow on a Synology/QNAP device (any NAS), OpenVZ, LXC or other container platforms. KVM, ESX, Hyper-V and other full virtualization platforms are supported.
 
 !!! info
-    - mailcow: dockerized requires [some ports](#default-ports) to be open for incoming connections, so make sure that your firewall is not blocking these.
+    - mailcow: dockerized requires [some ports](#incoming-ports) to be open for incoming connections, so make sure that your firewall is not blocking these.
     - Make sure that no other application is interfering with mailcow's configuration, such as another mail service
     - A correct DNS setup is crucial to every good mailserver setup, so please make sure you got at least the [basics](../getstarted/prerequisite-dns.en.md#the-minimal-dns-configuration) covered before you begin!
     - Make sure that your system has a correct date and [time setup](#date-and-time). This is crucial for various components like two factor TOTP authentication.
@@ -22,10 +22,10 @@ Please make sure that your system has at least the following resources:
 !!! failure "Not supported"
 	**OpenVZ, Virtuozzo and LXC**
 
-ClamAV and Solr can be greedy with RAM. You may disable them in `mailcow.conf` by settings `SKIP_CLAMD=y` and `SKIP_SOLR=y`.
+ClamAV and Flatcurve (FTS Engine) can be greedy with RAM. You may disable them in `mailcow.conf` by settings `SKIP_CLAMD=y` and `SKIP_FTS=y`.
 
 !!! info 
-	We are aware that a pure MTA can run on 128 MiB RAM. mailcow is a full-grown and ready-to-use groupware with many extras making life easier. mailcow comes with a webserver, webmailer, ActiveSync (MS), antivirus, antispam, indexing (Solr), document scanner (Oletools), SQL (MariaDB), Cache (Redis), MDA, MTA, various web services etc.
+	We are aware that a pure MTA can run on 128 MiB RAM. mailcow is a full-grown and ready-to-use groupware with many extras making life easier. mailcow comes with a webserver, webmailer, ActiveSync (MS), antivirus, antispam, indexing, document scanner (Oletools), SQL (MariaDB), Cache (Redis), MDA, MTA, various web services etc.
 
 A single SOGo worker **can** acquire ~350 MiB RAM before it gets purged. The more ActiveSync connections you plan to use, the more RAM you will need. A default configuration spawns 20 workers.
 
@@ -41,15 +41,15 @@ We can help to correctly plan your setup as part of our support.
 !!! danger "Important"
     mailcow is using Docker as a base component, due to some technical differences across multiple platforms we do **not support all**, even if they can run Docker.
 
-The following table contains all operating systems officially supported and tested by us (*as of December 2024*):
+The following table contains all operating systems officially supported and tested by us (*as of August 2025*):
 
-| OS                   | Compatibility                                             |
-| -------------------- | --------------------------------------------------------- |
-| Alpine since 3.17    | [⚠️](https://www.alpinelinux.org/ "Limited Compatibility") |
-| Debian 11, 12        | [✅](https://www.debian.org/index.html "Fully Compatible") |
-| Ubuntu 20.04 - 24.04 | [✅](https://ubuntu.com/ "Fully Compatible")               |
-| Alma Linux 8, 9      | [✅](https://almalinux.org/ "Fully Compatible")            |
-| Rocky Linux 9        | [✅](https://rockylinux.org/ "Fully Compatible")           |
+| OS                      | Compatibility                                             |
+| ----------------------- | --------------------------------------------------------- |
+| Alpine since 3.19       | [⚠️](https://www.alpinelinux.org/ "Limited Compatibility") |
+| Debian 11 - 13[^1]      | [✅](https://www.debian.org/index.html "Fully Compatible") |
+| Ubuntu 22.04 (or newer) | [✅](https://ubuntu.com/ "Fully Compatible")               |
+| Alma Linux 8, 9         | [✅](https://almalinux.org/ "Fully Compatible")            |
+| Rocky Linux 9           | [✅](https://rockylinux.org/ "Fully Compatible")           |
 
 
 !!! info "Legend"
@@ -217,3 +217,5 @@ You may want to [disable cloud-init network changes.](https://wiki.hetzner.de/in
 ## MTU
 
 Especially relevant for OpenStack users: Check your MTU and set it accordingly in docker-compose.yml. See [Troubleshooting](../getstarted/install.md#users-with-a-mtu-not-equal-to-1500-eg-openstack) in our Installation guide.
+
+[^1]: During an upgrade from Debian 12 (Bookworm) to Debian 13 (Trixie), a service called `EXIM` may be installed, which blocks port 25 on the host. Therefore, it is advisable to remove this service before using mailcow.

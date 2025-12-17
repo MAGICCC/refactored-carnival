@@ -13,6 +13,8 @@ Funktionalität wird durch das [borgmatic Docker Image](https://github.com/borgm
 die `README` in diesem Repository an, um mehr über die anderen Optionen (wie z.B. Push-Benachrichtigungen) zu erfahren, die verfügbar sind.
 Diese Anleitung behandelt nur die Grundlagen.
 
+---
+
 ## Einrichten von borgmatic
 
 ### Erstellen oder ändern Sie `docker-compose.override.yml`
@@ -74,7 +76,7 @@ source_directories:
     - /mnt/source/rspamd
     - /mnt/source/postfix
 repositories:
-    - path: ssh://user@rsync.net:22/./mailcow
+    - path: ssh://uXXXXX@uXXXXX.your-storagebox.de:23/./mailcow
       label: rsync
 exclude_patterns:
     - '/mnt/source/postfix/public/'
@@ -108,8 +110,7 @@ EOF
     herzustellen. Bearbeiten Sie die `config.yaml` und fügen Sie `--skip-ssl` zu `options`, `restore_options` und `list_options` wie oben gezeigt hinzu.
     Ändern Sie außerdem `mysql_databases` in `mariadb_databases`, um Probleme mit zukünftigen Versionen von borgmatic und MariaDB zu vermeiden.
 
-Diese Datei ist ein minimales Beispiel für die Verwendung von borgmatic mit einem Konto `user` beim Cloud-Speicheranbieter `rsync.net` für
-ein Repository namens `mailcow` (siehe Einstellung `repositories`). Dies muss entsprechend angepasst werden.
+Diese Datei ist ein minimales Beispiel für die Verwendung von borgmatic mit einem Konto `uXXXXX` auf einer Storage Box beim Cloud-Speicheranbieter `Hetzner`. Als Repository wird `mailcow` verwendet (siehe Einstellung `repositories`). Dies muss entsprechend angepasst werden.
 
 Es wird sowohl das maildir als auch die MySQL-Datenbank gesichert, was alles ist, was Sie brauchen, um Ihre mailcow nach einem Vorfall wiederherzustellen.
 
@@ -196,12 +197,14 @@ Zustand befindet:
     docker-compose restart borgmatic-mailcow
     ```
 
+---
+
 ## Wiederherstellung von einem Backup
 
 Das Wiederherstellen eines Backups setzt voraus, dass Sie mit einer neuen Installation von mailcow beginnen, und dass Sie derzeit
 keine benutzerdefinierten Daten in ihrem maildir oder ihrer mailcow-Datenbank haben.
 
-### Wiederherstellen von maildir
+### Wiederherstellen von maildir (vollständig)
 
 !!! warning "Warnung"
     Dies wird Dateien in Ihrem maildir überschreiben! Führen Sie dies nicht aus, es sei denn, Sie beabsichtigen tatsächlich, Mail
@@ -231,6 +234,45 @@ Dann können Sie den folgenden Befehl verwenden, um das Maildir aus einem Backup
 
 Alternativ können Sie auch einen beliebigen Archivnamen aus der Liste der Archive angeben (siehe
 [Auflistung aller verfügbaren Archive](#auflistung-aller-verfugbaren-archive))
+
+### Wiederherstellen von maildir (pro Mailbox)
+
+Es besteht auch die Möglichkeit, nur eine einzelne Mailbox aus einem Backup wiederherzustellen. Angenommen, Sie möchten die Mailbox für `user@example.com` wiederherstellen.
+
+Auch hier gilt wieder, dass vor der Wiederherstellung das `ro`-Flag aus dem Volume in der `docker-compose.override.yml` entfernt werden muss, bevor Sie fortfahren.
+
+Wenn Sie die Konfiguration von oben verwendet haben, speichert Borgmatic die Backups im Verzeichnis `mnt/source/vmail/example.com/user/` (jetzt hier in dem Beispiel für unseren Nutzer `user@example.com`).
+
+Um diese Mailbox wiederherzustellen, verwenden Sie den folgenden Befehl:
+
+=== "docker compose (Plugin)"
+
+    ``` bash
+    docker compose exec borgmatic-mailcow borgmatic extract --path mnt/source/vmail/example.com/user --archive latest
+    ```
+
+=== "docker-compose (Standalone)"
+
+    ``` bash
+    docker-compose exec borgmatic-mailcow borgmatic extract --path mnt/source/vmail/example.com/user --archive latest
+    ```
+
+!!! info "Hinweis"
+    Statt `latest` können Sie auch einen beliebigen Archivnamen aus der Liste der Archive angeben (siehe [Auflistung aller verfügbaren Archive](#auflistung-aller-verfugbaren-archive))
+
+Je nachdem, wie lange es her ist, dass die ursprünglichen Daten gelöscht wurden, müssen Sie via Dovecot einen Reindex der Mailbox durchführen, damit die wiederhergestellten E-Mails in Ihrem E-Mail-Client angezeigt werden:
+
+=== "docker compose (Plugin)"
+
+    ``` bash
+    docker compose exec dovecot-mailcow doveadm index -u user@example.com '*'
+    ```
+
+=== "docker-compose (Standalone)"
+
+    ``` bash
+    docker-compose exec dovecot-mailcow doveadm index -u user@example.com '*'
+    ```
 
 ### MySQL wiederherstellen
 
@@ -276,6 +318,8 @@ Um mailcow neu zu starten, verwenden Sie den folgenden Befehl:
 Wenn Sie SELinux verwenden, werden dadurch auch alle Dateien in Ihrem vmail-Volume neu benannt. Seien Sie geduldig, denn dies kann
 eine Weile dauern kann, wenn Sie viele Dateien haben.
 
+---
+
 ## Nützliche Befehle
 
 ### Manueller Archivierungslauf (mit Debugging-Ausgabe)
@@ -314,13 +358,13 @@ neue Operationen durchgeführt werden können:
 === "docker compose (Plugin)"
 
     ``` bash
-    docker compose exec borgmatic-mailcow borg break-lock
+    docker compose exec borgmatic-mailcow borgmatic break-lock
     ```
 
 === "docker-compose (Standalone)"
 
     ``` bash
-    docker-compose exec borgmatic-mailcow borg break-lock
+    docker-compose exec borgmatic-mailcow borgmatic break-lock
     ```
 
 
@@ -339,13 +383,13 @@ Um das `keyfile` zu holen, führen Sie aus:
 === "docker compose (Plugin)"
 
     ``` bash
-    docker compose exec borgmatic-mailcow borg key export --paper user@rsync.net:mailcow
+    docker compose exec -e BORG_RSH="ssh -p 23" borgmatic-mailcow borg key export --paper uXXXXX@uXXXXX.your-storagebox.de:mailcow
     ```
 
 === "docker-compose (Standalone)"
 
     ``` bash
-    docker-compose exec borgmatic-mailcow borg key export --paper user@rsync.net:mailcow
+    docker-compose exec -e BORG_RSH="ssh -p 23" borgmatic-mailcow borg key export --paper uXXXXX@uXXXXX.your-storagebox.de:mailcow
     ```
 
-Wobei `user@rsync.net:mailcow` die URI zu Ihrem Repository ist.
+Wobei `uXXXXX@uXXXXX.your-storagebox.de:mailcow` die URI zu Ihrem Repository ist.

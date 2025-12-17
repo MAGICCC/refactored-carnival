@@ -27,7 +27,7 @@ nav = [
       {"Backup" = "backup_restore/b_n_r-backup.md"},
       {"Restore" = "backup_restore/b_n_r-restore.md"}
 	  ]},
-    {"Cold-standby (rolling backup)" = ["backup_restore/b_n_r-coldstandby.md"]},
+    {"Cold-standby (rolling backup)" = "backup_restore/b_n_r-coldstandby.md"},
     {"Manual backups" = [
       {"Maildir" = "backup_restore/b_n_r-backup_restore-maildir.md"},
       {"MySQL (mysqldump)" = "backup_restore/b_n_r-backup_restore-mysql.md"}

@@ -34,7 +34,8 @@ nav = [
 	  ]},
     {"mailcow-internal backups" = [
       {"Recover accidentally deleted data" = "backup_restore/b_n_r-accidental_deletion.md"}
-	]},
+	  ]}
+    ]},
   {"Post Installation Tasks" = [
     {"Advanced SSL" = "post_installation/firststeps-ssl.md"},
     {"Authorize Watchdog and Bounce Mails" = "post_installation/firststeps-authorize_watchdog_and_bounces.md"},
@@ -42,8 +43,7 @@ nav = [
     {"DMARC Reporting" = "post_installation/firststeps-dmarc_reporting.md"},
     {"IP bindings" = "post_installation/firststeps-ip_bindings.md"},
     {"Local MTA on Docker host" = "post_installation/firststeps-local_mta.md"},
-    {"Logging" = "post_installation/firststeps-logging.md"}
-	]},
+    {"Logging" = "post_installation/firststeps-logging.md"},
     {"Reverse Proxy" = [
       {"Overview" = "post_installation/reverse-proxy/r_p.md"},
       {"Apache 2.4" = "post_installation/reverse-proxy/r_p-apache24.md"},
@@ -248,4 +248,3 @@ permalink = true
 [project.markdown_extensions.md_in_html]
 [project.markdown_extensions.attr_list]
 [project.markdown_extensions.abbr]
-

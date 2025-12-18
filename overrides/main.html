@@ -1,11 +1,5 @@
 {% extends "base.html" %}
 
 {% block announce %}
-{% if config.project.theme.language == 'de' %}
-  <center><h4>Alle Befehle sind gemäß der Syntax des <a style="color:#6390e5;" href="https://docs.docker.com/compose/install/linux/">Docker Compose Plugin</a> und der <a style="color:#6390e5;" href="https://docs.docker.com/compose/install/other/">Standalone Variante</a> anwählbar.<br></h4></center>
-{% elif config.project.theme.language == 'en' %}
-  <center><h4>All Commands are available according to the <a style="color:#6390e5;" href="https://docs.docker.com/compose/install/linux/">Docker Compose Plugin</a> and the <a style="color:#6390e5;" href="https://docs.docker.com/compose/install/other/">Standalone Version</a> syntax</h4></center>
-{% else %}
-  <center><h4>All Commands are available according to the <a style="color:#6390e5;" href="https://docs.docker.com/compose/install/linux/">Docker Compose Plugin</a> and the <a style="color:#6390e5;" href="https://docs.docker.com/compose/install/other/">Standalone Version</a> syntax</h4></center>
-{% endif %}
+{{ config.theme.language }}
 {% endblock %}

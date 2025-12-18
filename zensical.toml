@@ -8,7 +8,7 @@ edit_uri = "../mailcow-dockerized-docs/edit/master/docs/"
 extra_css = ["assets/stylesheets/extra.css"]
 extra_javascript = ["assets/javascripts/client.js"]
 docs_dir = "docs"
-
+custom_dir = "overrides"
 
 nav = [
   {"Information & Support" = "index.md"},

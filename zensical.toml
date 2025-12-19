@@ -177,7 +177,7 @@ nav = [
 variant = "classic" # or modern
 logo = "assets/images/logo.svg"
 favicon = "assets/images/favicon.png"
-language = "en"
+#language = "en"
 custom_dir = "overrides"
 features = [
   "announce.dismiss",
